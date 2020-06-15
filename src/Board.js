@@ -20,6 +20,7 @@ function getPosition(el) {
 const Board = () => {
   const [circX, setX] = useState(50);
   const [circY, setY] = useState(50);
+  const [circleList, setCircleList] = useState([]);
   const inputRef = useRef();
 
   const handleMouse = (e) => {
@@ -28,8 +29,27 @@ const Board = () => {
     setX(clientX - rect.x);
     setY(clientY - rect.y);
   };
+
+  const handleClick = (e) => {
+    const { clientX, clientY } = e;
+    const rect = inputRef.current.getBoundingClientRect();
+    setCircleList([
+      ...circleList,
+      <Circle
+        key={circleList.length}
+        cx={clientX - rect.x}
+        cy={clientY - rect.y}
+      />,
+    ]);
+  };
+
   return (
-    <div className="Board" ref={inputRef} onMouseMove={(e) => handleMouse(e)}>
+    <div
+      className="Board"
+      ref={inputRef}
+      onMouseMove={(e) => handleMouse(e)}
+      onClick={(e) => handleClick(e)}
+    >
       <svg
         style={{
           position: "absolute",
@@ -39,6 +59,7 @@ const Board = () => {
           height: "100%",
         }}
       >
+        {circleList}
         <Circle cx={circX} cy={circY} />
       </svg>
     </div>

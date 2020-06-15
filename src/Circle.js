@@ -8,7 +8,7 @@ const Circle = (props) => {
       r="40"
       stroke="black"
       strokeWidth="2"
-      fill="pink"
+      fill="none"
     />
   );
 };
