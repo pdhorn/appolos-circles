@@ -2,20 +2,19 @@ import React, { useRef, useState } from "react";
 import "./Board.css";
 import Circle from "./Circle.js";
 
-function getPosition(el) {
-  var xPosition = 0;
-  var yPosition = 0;
+const dist = (a, b) => {
+  console.log(a, b);
+  Math.sqrt((a.props.cx - b.props.cx) ** 2 + (a.props.cy - b.props.cy) ** 2);
+};
 
-  while (el) {
-    xPosition += el.offsetLeft - el.scrollLeft + el.clientLeft;
-    yPosition += el.offsetTop - el.scrollTop + el.clientTop;
-    el = el.offsetParent;
+const not_transverse = (circle, otherCircles) => {
+  if (otherCircles.length === 0) {
+    return true;
   }
-  return {
-    x: xPosition,
-    y: yPosition,
-  };
-}
+  otherCircles
+    .map((c) => dist(circle, c) >= circle.r + c.r)
+    .every((x) => x === true);
+};
 
 const Board = () => {
   const [circX, setX] = useState(50);
