@@ -3,22 +3,24 @@ import "./Board.css";
 import Circle from "./Circle.js";
 
 const dist = (a, b) => {
-  console.log(a, b);
-  Math.sqrt((a.props.cx - b.props.cx) ** 2 + (a.props.cy - b.props.cy) ** 2);
+  return Math.sqrt((a.cx - b.props.cx) ** 2 + (a.cy - b.props.cy) ** 2);
 };
 
 const not_transverse = (circle, otherCircles) => {
   if (otherCircles.length === 0) {
     return true;
   }
-  otherCircles
-    .map((c) => dist(circle, c) >= circle.r + c.r)
+  return otherCircles
+    .map((c) => {
+      return dist(circle, c) >= circle.r + c.props.r;
+    })
     .every((x) => x === true);
 };
 
 const Board = () => {
   const [circX, setX] = useState(50);
   const [circY, setY] = useState(50);
+  const [circR, setR] = useState(40);
   const [circleList, setCircleList] = useState([]);
   const inputRef = useRef();
 
@@ -32,14 +34,17 @@ const Board = () => {
   const handleClick = (e) => {
     const { clientX, clientY } = e;
     const rect = inputRef.current.getBoundingClientRect();
-    setCircleList([
-      ...circleList,
-      <Circle
-        key={circleList.length}
-        cx={clientX - rect.x}
-        cy={clientY - rect.y}
-      />,
-    ]);
+    if (not_transverse({ cx: circX, cy: circY, r: circR }, circleList)) {
+      setCircleList([
+        ...circleList,
+        <Circle
+          key={circleList.length}
+          cx={clientX - rect.x}
+          cy={clientY - rect.y}
+          r={circR}
+        />,
+      ]);
+    }
   };
 
   return (
@@ -59,7 +64,7 @@ const Board = () => {
         }}
       >
         {circleList}
-        <Circle cx={circX} cy={circY} />
+        <Circle cx={circX} cy={circY} r="40" />
       </svg>
     </div>
   );
