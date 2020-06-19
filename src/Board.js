@@ -1,19 +1,20 @@
 import React, { useRef, useState } from "react";
 import "./Board.css";
 import Circle from "./Circle.js";
+import beep from "./beep.js";
 
 const colors = [
   "gold",
   "blue",
   "green",
-  "yellow",
+  // "yellow",
   "black",
   "grey",
   "darkgreen",
   "pink",
   "brown",
   "slateblue",
-  "grey1",
+  // "grey1",
   "orange",
 ];
 
@@ -33,6 +34,7 @@ const not_transverse = (circle, otherCircles) => {
 };
 
 const Board = () => {
+  const [score, setScore] = useState(0);
   const [circX, setX] = useState(50);
   const [circY, setY] = useState(50);
   const [circR, setR] = useState(40);
@@ -61,30 +63,58 @@ const Board = () => {
           color={circColor}
         />,
       ]);
-      setR(Math.floor(90 * Math.random(10, 100) + 10));
+      setR(Math.floor(70 * Math.random(10, 80) + 10));
       setColor(colors[Math.floor(Math.random() * colors.length)]);
+      setScore(score + 1);
+    } else {
+      beep();
     }
   };
 
+  const reset = () => {
+    setScore(0);
+    setX(50);
+    setY(50);
+    setR(40);
+    setColor("black");
+    setCircleList([]);
+  };
+
   return (
-    <div
-      className="Board"
-      ref={inputRef}
-      onMouseMove={(e) => handleMouse(e)}
-      onClick={(e) => handleClick(e)}
-    >
-      <svg
-        style={{
-          position: "absolute",
-          left: "0",
-          top: "0",
-          width: "100%",
-          height: "100%",
-        }}
+    <div>
+      <div
+        className="Board"
+        ref={inputRef}
+        onMouseMove={(e) => handleMouse(e)}
+        onClick={(e) => handleClick(e)}
       >
-        {circleList}
-        <Circle cx={circX} cy={circY} r={circR} color={circColor} />
-      </svg>
+        <div>Score: {score}</div>
+        <svg
+          style={{
+            position: "absolute",
+            left: "0",
+            top: "0",
+            width: "100%",
+            height: "100%",
+          }}
+        >
+          {circleList}
+          <Circle cx={circX} cy={circY} r={circR} color={circColor} />
+        </svg>
+      </div>
+      <div>
+        <button
+          style={{
+            position: "absolute",
+            top: "90%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+          }}
+          onClick={reset}
+        >
+          New game
+        </button>
+      </div>
     </div>
   );
 };
