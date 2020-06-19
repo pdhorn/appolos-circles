@@ -2,6 +2,21 @@ import React, { useRef, useState } from "react";
 import "./Board.css";
 import Circle from "./Circle.js";
 
+const colors = [
+  "gold",
+  "blue",
+  "green",
+  "yellow",
+  "black",
+  "grey",
+  "darkgreen",
+  "pink",
+  "brown",
+  "slateblue",
+  "grey1",
+  "orange",
+];
+
 const dist = (a, b) => {
   return Math.sqrt((a.cx - b.props.cx) ** 2 + (a.cy - b.props.cy) ** 2);
 };
@@ -21,6 +36,7 @@ const Board = () => {
   const [circX, setX] = useState(50);
   const [circY, setY] = useState(50);
   const [circR, setR] = useState(40);
+  const [circColor, setColor] = useState("black");
   const [circleList, setCircleList] = useState([]);
   const inputRef = useRef();
 
@@ -42,8 +58,11 @@ const Board = () => {
           cx={clientX - rect.x}
           cy={clientY - rect.y}
           r={circR}
+          color={circColor}
         />,
       ]);
+      setR(Math.floor(90 * Math.random(10, 100) + 10));
+      setColor(colors[Math.floor(Math.random() * colors.length)]);
     }
   };
 
@@ -64,7 +83,7 @@ const Board = () => {
         }}
       >
         {circleList}
-        <Circle cx={circX} cy={circY} r="40" />
+        <Circle cx={circX} cy={circY} r={circR} color={circColor} />
       </svg>
     </div>
   );

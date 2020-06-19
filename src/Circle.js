@@ -5,8 +5,8 @@ const Circle = (props) => {
     <circle
       cx={props.cx}
       cy={props.cy}
-      r="40"
-      stroke="black"
+      r={props.r}
+      stroke={props.color}
       strokeWidth="2"
       fill="none"
     />
