@@ -23,14 +23,27 @@ const dist = (a, b) => {
 };
 
 const not_transverse = (circle, otherCircles) => {
+  const stroke_width = 2;
   if (otherCircles.length === 0) {
-    return true;
+    return 1;
   }
-  return otherCircles
-    .map((c) => {
-      return dist(circle, c) >= circle.r + c.props.r;
-    })
+  const dist_and_col = otherCircles.map((c) => {
+    return [
+      dist(circle, c) - circle.r - c.props.r,
+      circle.color === c.props.color,
+    ];
+  });
+  const valid_play = dist_and_col
+    .map(([d, c]) => d >= 0)
     .every((x) => x === true);
+  const local_score = dist_and_col
+    .map(([d, c]) => (1 ? d >= 0 && d <= stroke_width : 0) + (1 ? c : 0))
+    .reduce((a, b) => a + b, 0);
+  if (valid_play) {
+    return 1 + local_score;
+  } else {
+    return 0;
+  }
 };
 
 const Board = () => {
@@ -52,7 +65,11 @@ const Board = () => {
   const handleClick = (e) => {
     const { clientX, clientY } = e;
     const rect = inputRef.current.getBoundingClientRect();
-    if (not_transverse({ cx: circX, cy: circY, r: circR }, circleList)) {
+    const score_if_valid = not_transverse(
+      { cx: circX, cy: circY, r: circR, color: circColor },
+      circleList
+    );
+    if (score_if_valid > 0) {
       setCircleList([
         ...circleList,
         <Circle
@@ -65,7 +82,7 @@ const Board = () => {
       ]);
       setR(Math.floor(70 * Math.random(10, 80) + 10));
       setColor(colors[Math.floor(Math.random() * colors.length)]);
-      setScore(score + 1);
+      setScore(score + score_if_valid);
     } else {
       beep();
     }
