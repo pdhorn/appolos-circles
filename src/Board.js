@@ -1,7 +1,10 @@
 import React, { useRef, useState } from "react";
+import ReactDOM from "react-dom";
 import "./Board.css";
 import Circle from "./Circle.js";
 import beep from "./beep.js";
+import useModal from "./useModal";
+import "./Modal.css";
 
 const colors = [
   "gold",
@@ -10,7 +13,7 @@ const colors = [
   // "yellow",
   "black",
   "grey",
-  "darkgreen",
+  // "darkgreen",
   "pink",
   "brown",
   "slateblue",
@@ -53,6 +56,7 @@ const Board = () => {
   const [circR, setR] = useState(40);
   const [circColor, setColor] = useState("black");
   const [circleList, setCircleList] = useState([]);
+  const [isShowing, toggle] = useModal();
   const inputRef = useRef();
 
   const handleMouse = (e) => {
@@ -98,14 +102,54 @@ const Board = () => {
   };
 
   return (
-    <div>
+    <div
+      onClick={() => {
+        if (isShowing) {
+          toggle();
+        }
+      }}
+    >
       <div
         className="Board"
         ref={inputRef}
         onMouseMove={(e) => handleMouse(e)}
         onClick={(e) => handleClick(e)}
       >
-        <div>Score: {score}</div>
+        <div
+          style={{
+            position: "absolute",
+            top: "100%",
+          }}
+        >
+          Score: {score}
+        </div>
+        <div>
+          <button
+            style={{
+              position: "absolute",
+              top: "100%",
+              left: "50%",
+              transform: "translate(-50%, 10%)",
+            }}
+            onClick={reset}
+          >
+            New game
+          </button>
+        </div>
+        <div>
+          <button
+            style={{
+              position: "absolute",
+              top: "100%",
+              left: "100%",
+              transform: "translate(-100%, 10%)",
+              margin: "0",
+            }}
+            onClick={toggle}
+          >
+            Rules
+          </button>
+        </div>
         <svg
           style={{
             position: "absolute",
@@ -115,25 +159,61 @@ const Board = () => {
             height: "100%",
           }}
         >
+          <rect
+            width="100%"
+            height="100%"
+            style={{ fill: "rgb(255,255,255)" }}
+          />
           {circleList}
           <Circle cx={circX} cy={circY} r={circR} color={circColor} />
         </svg>
       </div>
-      <div>
-        <button
-          style={{
-            position: "absolute",
-            top: "90%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-          }}
-          onClick={reset}
-        >
-          New game
-        </button>
-      </div>
+
+      <Modal
+        isShowing={isShowing}
+        buttonAction={() => {
+          toggle();
+        }}
+      />
     </div>
   );
+};
+
+const Modal = ({ isShowing }) => {
+  return isShowing
+    ? ReactDOM.createPortal(
+        <React.Fragment>
+          <div className="modal-overlay" />
+          <div
+            className="modal-wrapper"
+            aria-modal
+            aria-hidden
+            tabIndex={-1}
+            role="dialog"
+          >
+            <div className="modal">
+              <div className="modal-header">
+                {" "}
+                Plop as many circles as you can without overlapping them. <br />
+                <br />
+                Earn points:
+                <ul>
+                  <li>+1 for each circle you plop</li>
+                  <li>
+                    +1 for each circle that is tangent to your plopped circle
+                  </li>
+                  <li>
+                    +1 for each circle that is tangent to and of the same color
+                    as your plopped circle
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </React.Fragment>,
+        document.body
+      )
+    : null;
 };
 
 export default Board;
