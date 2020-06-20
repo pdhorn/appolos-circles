@@ -40,7 +40,16 @@ const not_transverse = (circle, otherCircles) => {
     .map(([d, c]) => d >= 0)
     .every((x) => x === true);
   const local_score = dist_and_col
-    .map(([d, c]) => (1 ? d >= 0 && d <= stroke_width : 0) + (1 ? c : 0))
+    .map(([d, c]) => {
+      let val = 0;
+      if (d >= 0 && d <= stroke_width) {
+        val += 1;
+        if (c) {
+          val += 1;
+        }
+      }
+      return val;
+    })
     .reduce((a, b) => a + b, 0);
   if (valid_play) {
     return 1 + local_score;
