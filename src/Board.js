@@ -118,12 +118,7 @@ const Board = () => {
         }
       }}
     >
-      <div
-        className="Board"
-        ref={inputRef}
-        onMouseMove={(e) => handleMouse(e)}
-        onClick={(e) => handleClick(e)}
-      >
+      <div className="Board" ref={inputRef}>
         <div
           style={{
             position: "absolute",
@@ -167,6 +162,8 @@ const Board = () => {
             width: "100%",
             height: "100%",
           }}
+          onMouseMove={(e) => handleMouse(e)}
+          onClick={(e) => handleClick(e)}
         >
           <rect
             width="100%"
