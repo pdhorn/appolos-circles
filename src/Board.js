@@ -65,7 +65,14 @@ const Board = () => {
   const [circR, setR] = useState(40);
   const [circColor, setColor] = useState("black");
   const [circleList, setCircleList] = useState([]);
-  const [isShowing, toggle] = useModal();
+  // todo grab high scores from API in component did mount, and log the game as played
+  const [highScores, setHighScores] = useState([
+    { name: "Peter", score: 10 },
+    { name: "Sam", score: 5 },
+  ]);
+  const [scoresNeedUpdating, setScoresNeedUpdating] = useState(false);
+  const [rulesIsShowing, rulesToggle] = useModal();
+  const [scoreIsShowing, scoreToggle] = useModal();
   const inputRef = useRef();
 
   const handleMouse = (e) => {
@@ -78,6 +85,9 @@ const Board = () => {
   const handleClick = (e) => {
     const { clientX, clientY } = e;
     const rect = inputRef.current.getBoundingClientRect();
+    setX(clientX - rect.x);
+    setY(clientY - rect.y);
+
     const score_if_valid = not_transverse(
       { cx: circX, cy: circY, r: circR, color: circColor },
       circleList
@@ -101,6 +111,38 @@ const Board = () => {
     }
   };
 
+  const handleScore = () => {
+    const currentScore = {
+      name: "Enter your name",
+      current: true,
+      score: score,
+    };
+    let allScores = [...highScores, currentScore]
+      .sort((a, b) => b.score - a.score)
+      .slice(0, Math.min(highScores.length + 1, 10));
+    if (allScores.map((s) => s.current).some((x) => x)) {
+      setScoresNeedUpdating(true);
+    }
+  };
+
+  const adjustScores = () => {
+    if (scoresNeedUpdating) {
+      console.log();
+      const newScores = highScores.map((hs) => {
+        if (hs.current) {
+          return {
+            name: document.getElementById("nameField").value,
+            score: hs.score,
+          };
+        } else {
+          return hs;
+        }
+      });
+      // todo store in API
+      setHighScores(newScores);
+    }
+  };
+
   const reset = () => {
     setScore(0);
     setX(50);
@@ -108,13 +150,14 @@ const Board = () => {
     setR(40);
     setColor("black");
     setCircleList([]);
+    setScoresNeedUpdating(false);
   };
 
   return (
     <div
       onClick={() => {
-        if (isShowing) {
-          toggle();
+        if (rulesIsShowing) {
+          rulesToggle();
         }
       }}
     >
@@ -135,7 +178,10 @@ const Board = () => {
               left: "50%",
               transform: "translate(-50%, 10%)",
             }}
-            onClick={reset}
+            onClick={() => {
+              handleScore();
+              scoreToggle();
+            }}
           >
             New game
           </button>
@@ -149,7 +195,7 @@ const Board = () => {
               transform: "translate(-100%, 10%)",
               margin: "0",
             }}
-            onClick={toggle}
+            onClick={rulesToggle}
           >
             Rules
           </button>
@@ -175,17 +221,22 @@ const Board = () => {
         </svg>
       </div>
 
-      <Modal
-        isShowing={isShowing}
+      <RulesModal isShowing={rulesIsShowing} />
+      <ScoreModal
+        isShowing={scoreIsShowing}
         buttonAction={() => {
-          toggle();
+          scoreToggle();
+          adjustScores();
+          // todo log the game was played
+          reset();
         }}
+        highScores={highScores}
       />
     </div>
   );
 };
 
-const Modal = ({ isShowing }) => {
+const RulesModal = ({ isShowing }) => {
   return isShowing
     ? ReactDOM.createPortal(
         <React.Fragment>
@@ -199,7 +250,6 @@ const Modal = ({ isShowing }) => {
           >
             <div className="modal">
               <div className="modal-header">
-                {" "}
                 Plop as many circles as you can without overlapping them. <br />
                 <br />
                 Earn points:
@@ -214,6 +264,52 @@ const Modal = ({ isShowing }) => {
                   </li>
                 </ul>
               </div>
+            </div>
+          </div>
+        </React.Fragment>,
+        document.body
+      )
+    : null;
+};
+
+const ScoreModal = ({ isShowing, buttonAction, highScores }) => {
+  return isShowing
+    ? ReactDOM.createPortal(
+        <React.Fragment>
+          <div className="modal-overlay" />
+          <div
+            className="modal-wrapper"
+            aria-modal
+            aria-hidden
+            tabIndex={-1}
+            role="dialog"
+          >
+            <div className="modal">
+              <div className="modal-header">High scores</div>
+              <ol>
+                {highScores.map((hs, ind) => {
+                  if (!hs.hasOwnProperty("current")) {
+                    return (
+                      <li key={ind}>
+                        {hs.name} - {hs.score}
+                      </li>
+                    );
+                  } else if (hs.current === true) {
+                    return (
+                      <li key={ind}>
+                        <input
+                          id="nameField"
+                          type="text"
+                          defaultValue={hs.name}
+                        ></input>{" "}
+                        - {hs.score}
+                      </li>
+                    );
+                  }
+                  return true;
+                })}
+              </ol>
+              <button onClick={buttonAction}>New game</button>
             </div>
           </div>
         </React.Fragment>,
