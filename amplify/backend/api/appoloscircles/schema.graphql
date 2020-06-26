@@ -1,0 +1,12 @@
+type HighScore @model {
+  id: ID!
+  name: String!
+  score: Int!
+}
+
+type Game @model {
+  id: ID!
+  startDate: String!
+  name: String
+  score: Int
+}
