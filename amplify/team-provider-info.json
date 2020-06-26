@@ -11,5 +11,18 @@
             "StackId": "arn:aws:cloudformation:us-east-2:749178654254:stack/amplify-appoloscircles-dev-183857/b6826c90-b5aa-11ea-9d20-0681d34c9248",
             "AmplifyAppId": "d2dh4k8pyzxost"
         }
+    },
+    "prod": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-appoloscircles-prod-185041-authRole",
+            "UnauthRoleArn": "arn:aws:iam::749178654254:role/amplify-appoloscircles-prod-185041-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::749178654254:role/amplify-appoloscircles-prod-185041-authRole",
+            "Region": "us-east-2",
+            "DeploymentBucketName": "amplify-appoloscircles-prod-185041-deployment",
+            "UnauthRoleName": "amplify-appoloscircles-prod-185041-unauthRole",
+            "StackName": "amplify-appoloscircles-prod-185041",
+            "StackId": "arn:aws:cloudformation:us-east-2:749178654254:stack/amplify-appoloscircles-prod-185041/d910cc20-b807-11ea-a643-02eb519684da",
+            "AmplifyAppId": "d2dh4k8pyzxost"
+        }
     }
 }
