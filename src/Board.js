@@ -87,6 +87,12 @@ const Board = () => {
     fetchHighScores();
   }, []);
 
+  useEffect(() => {
+    if (scoreIsShowing) {
+      document.getElementById("nameField").select();
+    }
+  }, [scoreIsShowing]);
+
   const newGame = () => {
     API.graphql(
       graphqlOperation(createGame, {
@@ -392,7 +398,7 @@ const ScoreModal = ({ isShowing, buttonAction, highScores }) => {
                           id="nameField"
                           type="text"
                           defaultValue={hs.name}
-                        ></input>{" "}
+                        />{" "}
                         - {hs.score}
                       </li>
                     );
