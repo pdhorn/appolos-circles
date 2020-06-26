@@ -8,6 +8,7 @@ import "./Modal.css";
 import { API, graphqlOperation } from "aws-amplify";
 import {
   createGame,
+  updateGame,
   createHighScore,
   deleteHighScore,
 } from "./graphql/mutations";
@@ -85,9 +86,35 @@ const Board = () => {
   const inputRef = useRef();
 
   useEffect(() => {
-    // newGame();
+    newGame();
     // fetchHighScores();
   }, []);
+
+  const newGame = () => {
+    API.graphql(
+      graphqlOperation(createGame, {
+        input: { startDate: new Date().toUTCString() },
+      })
+    )
+      .then((resp) => {
+        setGameID(resp.data.createGame.id);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const nameToGame = (i, n, s) => {
+    API.graphql(
+      graphqlOperation(updateGame, { input: { id: i, name: n, score: s } })
+    )
+      .then((resp) => {
+        console.log(resp.data.updateGame.id, "updated");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   // async function newGame() {
   //   try {
@@ -194,6 +221,7 @@ const Board = () => {
           const s = hs.score;
           console.log(n, s);
           setCurrentName(n);
+          nameToGame(gameID, n, s);
           //todo check this
           // saveScore(n, s);
           return {
