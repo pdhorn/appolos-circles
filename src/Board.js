@@ -76,7 +76,6 @@ const Board = () => {
     { name: "Peter", score: 10 },
     { name: "Sam", score: 5 },
   ]);
-  const [currentName, setCurrentName] = useState();
   const [scoresNeedUpdating, setScoresNeedUpdating] = useState(false);
   const [gameID, setGameID] = useState("");
   const [rulesIsShowing, rulesToggle] = useModal();
@@ -221,7 +220,6 @@ const Board = () => {
         if (hs.current) {
           const n = document.getElementById("nameField").value;
           const s = hs.score;
-          setCurrentName(n);
           nameToGame(gameID, n, s);
           saveScore(n, s);
           return {
