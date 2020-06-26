@@ -87,7 +87,7 @@ const Board = () => {
 
   useEffect(() => {
     newGame();
-    // fetchHighScores();
+    fetchHighScores();
   }, []);
 
   const newGame = () => {
@@ -116,44 +116,27 @@ const Board = () => {
       });
   };
 
-  // async function newGame() {
-  //   try {
-  //     const response = await API.graphql(
-  //       graphqlOperation(createGame, {
-  //         input: { startDate: new Date().toUTCString() },
-  //       })
-  //     );
-  //     setGameID(response.data.createGame.id);
-  //     console.log("new game", response.data.createGame.id);
-  //   } catch (err) {
-  //     console.log("error creating new game: ", err);
-  //   }
-  // }
-
-  // async function saveScore(n, s) {
-  //   console.log("saveScore with n, s", n, s);
-  //   try {
-  //     const response = await API.graphql(
-  //       graphqlOperation(createHighScore, {
-  //         input: { name: n, score: s },
-  //       })
-  //     );
-  //     console.log("saved", response);
-  //   } catch (err) {
-  //     console.log("error saving high score: ", err);
-  //     console.log({ name: n, score: s });
-  //   }
-  // }
-
-  // async function fetchHighScores() {
-  //   try {
-  //     const response = await API.graphql(graphqlOperation(listHighScores));
-  //     console.log(response.data.listHighScores);
-  //     // setHighScores(response.data.createGame.id);
-  //   } catch (err) {
-  //     console.log("error creating new game: ", err);
-  //   }
-  // }
+  const fetchHighScores = () => {
+    API.graphql(
+      graphqlOperation(
+        `query getShortHighScores{
+          listHighScores {
+            items {
+              id
+              name
+              score
+            }
+          }
+        }`
+      )
+    )
+      .then((resp) => {
+        setHighScores(resp.data.listHighScores.items);
+      })
+      .catch((err) => {
+        console.log("error creating new game: ", err);
+      });
+  };
 
   const handleMouse = (e) => {
     const { clientX, clientY } = e;
