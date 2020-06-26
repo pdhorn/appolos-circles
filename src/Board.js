@@ -1,10 +1,17 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import "./Board.css";
 import Circle from "./Circle.js";
 import beep from "./beep.js";
 import useModal from "./useModal";
 import "./Modal.css";
+import { API, graphqlOperation } from "aws-amplify";
+import {
+  createGame,
+  createHighScore,
+  deleteHighScore,
+} from "./graphql/mutations";
+import { listHighScores, getGame } from "./graphql/queries";
 
 const colors = [
   "gold",
@@ -70,10 +77,56 @@ const Board = () => {
     { name: "Peter", score: 10 },
     { name: "Sam", score: 5 },
   ]);
+  const [currentName, setCurrentName] = useState();
   const [scoresNeedUpdating, setScoresNeedUpdating] = useState(false);
+  const [gameID, setGameID] = useState("");
   const [rulesIsShowing, rulesToggle] = useModal();
   const [scoreIsShowing, scoreToggle] = useModal();
   const inputRef = useRef();
+
+  useEffect(() => {
+    // newGame();
+    // fetchHighScores();
+  }, []);
+
+  // async function newGame() {
+  //   try {
+  //     const response = await API.graphql(
+  //       graphqlOperation(createGame, {
+  //         input: { startDate: new Date().toUTCString() },
+  //       })
+  //     );
+  //     setGameID(response.data.createGame.id);
+  //     console.log("new game", response.data.createGame.id);
+  //   } catch (err) {
+  //     console.log("error creating new game: ", err);
+  //   }
+  // }
+
+  // async function saveScore(n, s) {
+  //   console.log("saveScore with n, s", n, s);
+  //   try {
+  //     const response = await API.graphql(
+  //       graphqlOperation(createHighScore, {
+  //         input: { name: n, score: s },
+  //       })
+  //     );
+  //     console.log("saved", response);
+  //   } catch (err) {
+  //     console.log("error saving high score: ", err);
+  //     console.log({ name: n, score: s });
+  //   }
+  // }
+
+  // async function fetchHighScores() {
+  //   try {
+  //     const response = await API.graphql(graphqlOperation(listHighScores));
+  //     console.log(response.data.listHighScores);
+  //     // setHighScores(response.data.createGame.id);
+  //   } catch (err) {
+  //     console.log("error creating new game: ", err);
+  //   }
+  // }
 
   const handleMouse = (e) => {
     const { clientX, clientY } = e;
@@ -112,27 +165,40 @@ const Board = () => {
   };
 
   const handleScore = () => {
+    console.log("handle score");
     const currentScore = {
       name: "Enter your name",
       current: true,
       score: score,
     };
+    console.log(currentScore);
     let allScores = [...highScores, currentScore]
       .sort((a, b) => b.score - a.score)
       .slice(0, Math.min(highScores.length + 1, 10));
+    console.log("all scores", allScores);
     if (allScores.map((s) => s.current).some((x) => x)) {
+      console.log("scores need updating");
       setScoresNeedUpdating(true);
+      setHighScores(allScores);
     }
   };
 
   const adjustScores = () => {
+    console.log("adjustScores");
     if (scoresNeedUpdating) {
-      console.log();
+      console.log("here");
+      console.log(highScores);
       const newScores = highScores.map((hs) => {
         if (hs.current) {
+          const n = document.getElementById("nameField").value;
+          const s = hs.score;
+          console.log(n, s);
+          setCurrentName(n);
+          //todo check this
+          // saveScore(n, s);
           return {
-            name: document.getElementById("nameField").value,
-            score: hs.score,
+            name: n,
+            score: s,
           };
         } else {
           return hs;
@@ -288,6 +354,7 @@ const ScoreModal = ({ isShowing, buttonAction, highScores }) => {
               <div className="modal-header">High scores</div>
               <ol>
                 {highScores.map((hs, ind) => {
+                  console.log("hss", hs);
                   if (!hs.hasOwnProperty("current")) {
                     return (
                       <li key={ind}>
