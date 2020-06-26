@@ -12,7 +12,6 @@ import {
   createHighScore,
   deleteHighScore,
 } from "./graphql/mutations";
-import { listHighScores, getGame } from "./graphql/queries";
 
 const colors = [
   "gold",
@@ -73,7 +72,6 @@ const Board = () => {
   const [circR, setR] = useState(40);
   const [circColor, setColor] = useState("black");
   const [circleList, setCircleList] = useState([]);
-  // todo grab high scores from API in component did mount, and log the game as played
   const [highScores, setHighScores] = useState([
     { name: "Peter", score: 10 },
     { name: "Sam", score: 5 },
@@ -109,7 +107,7 @@ const Board = () => {
       graphqlOperation(updateGame, { input: { id: i, name: n, score: s } })
     )
       .then((resp) => {
-        console.log(resp.data.updateGame.id, "updated");
+        console.log(resp.data.updateGame.id, "game updated with name", n);
       })
       .catch((err) => {
         console.log(err);
@@ -135,6 +133,26 @@ const Board = () => {
       })
       .catch((err) => {
         console.log("error creating new game: ", err);
+      });
+  };
+
+  const deleteScore = (id) => {
+    API.graphql(graphqlOperation(deleteHighScore, { input: { id: id } }))
+      .then((resp) => {
+        console.log(resp.data.deleteHighScore.id, "score deleted");
+      })
+      .catch((err) => {
+        console.log("error deleting high score:", id, err);
+      });
+  };
+
+  const saveScore = (name, score) => {
+    API.graphql(graphqlOperation(createHighScore, { input: { name, score } }))
+      .then((resp) => {
+        console.log(resp.data.createHighScore.id, "score created");
+      })
+      .catch((err) => {
+        console.log("error saving high score:", name, score, err);
       });
   };
 
@@ -175,38 +193,37 @@ const Board = () => {
   };
 
   const handleScore = () => {
-    console.log("handle score");
     const currentScore = {
       name: "Enter your name",
       current: true,
       score: score,
     };
-    console.log(currentScore);
-    let allScores = [...highScores, currentScore]
-      .sort((a, b) => b.score - a.score)
-      .slice(0, Math.min(highScores.length + 1, 10));
-    console.log("all scores", allScores);
+    let allScores = [...highScores, currentScore].sort(
+      (a, b) => b.score - a.score
+    );
+    const maxLength = 10;
+    if (allScores.length > maxLength) {
+      const scoreToDelete = allScores[10];
+      if (scoreToDelete.hasOwnProperty("id")) {
+        deleteScore(scoreToDelete.id);
+      }
+      allScores = allScores.slice(0, Math.min(highScores.length + 1, 10));
+    }
     if (allScores.map((s) => s.current).some((x) => x)) {
-      console.log("scores need updating");
       setScoresNeedUpdating(true);
       setHighScores(allScores);
     }
   };
 
   const adjustScores = () => {
-    console.log("adjustScores");
     if (scoresNeedUpdating) {
-      console.log("here");
-      console.log(highScores);
       const newScores = highScores.map((hs) => {
         if (hs.current) {
           const n = document.getElementById("nameField").value;
           const s = hs.score;
-          console.log(n, s);
           setCurrentName(n);
           nameToGame(gameID, n, s);
-          //todo check this
-          // saveScore(n, s);
+          saveScore(n, s);
           return {
             name: n,
             score: s,
@@ -215,7 +232,6 @@ const Board = () => {
           return hs;
         }
       });
-      // todo store in API
       setHighScores(newScores);
     }
   };
@@ -228,6 +244,7 @@ const Board = () => {
     setColor("black");
     setCircleList([]);
     setScoresNeedUpdating(false);
+    newGame();
   };
 
   return (
@@ -304,7 +321,6 @@ const Board = () => {
         buttonAction={() => {
           scoreToggle();
           adjustScores();
-          // todo log the game was played
           reset();
         }}
         highScores={highScores}
@@ -365,7 +381,6 @@ const ScoreModal = ({ isShowing, buttonAction, highScores }) => {
               <div className="modal-header">High scores</div>
               <ol>
                 {highScores.map((hs, ind) => {
-                  console.log("hss", hs);
                   if (!hs.hasOwnProperty("current")) {
                     return (
                       <li key={ind}>
