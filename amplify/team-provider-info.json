@@ -10,6 +10,11 @@
             "StackName": "amplify-appoloscircles-dev-183857",
             "StackId": "arn:aws:cloudformation:us-east-2:749178654254:stack/amplify-appoloscircles-dev-183857/b6826c90-b5aa-11ea-9d20-0681d34c9248",
             "AmplifyAppId": "d2dh4k8pyzxost"
+        },
+        "categories": {
+            "auth": {
+                "appoloscirclesc3d9929a": {}
+            }
         }
     },
     "prod": {

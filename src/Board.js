@@ -4,6 +4,7 @@ import "./Board.css";
 import Circle from "./Circle.js";
 import beep from "./beep.js";
 import useModal from "./useModal";
+import "./Switch.css";
 import "./Modal.css";
 import { API, graphqlOperation } from "aws-amplify";
 import {
@@ -283,6 +284,26 @@ const Board = () => {
           >
             New game
           </button>
+        </div>
+        <div
+          style={{
+            position: "absolute",
+            opacity: "99%",
+            top: "100%",
+            left: "75%",
+            transform: "translate(-100%, 10%)",
+            margin: "0",
+            zIndex: 5,
+          }}
+        >
+          <label className={"switch"}>
+            PROR
+            <input type="checkbox" defaultChecked="true" id="switch" />
+            <span className={"slider round"}></span>
+          </label>
+          <label htmlFor="switch">
+            <span data-yes="hollow" data-no="solid" />
+          </label>
         </div>
         <div>
           <button
