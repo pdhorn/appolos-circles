@@ -6,9 +6,9 @@ const Circle = (props) => {
       cx={props.cx}
       cy={props.cy}
       r={props.r}
-      stroke={props.color}
+      stroke={"black"}
       strokeWidth="2"
-      fill="none"
+      fill={props.color}
     />
   );
 };
