@@ -4,7 +4,6 @@ import "./Board.css";
 import Circle from "./Circle.js";
 import beep from "./beep.js";
 import useModal from "./useModal";
-import "./Switch.css";
 import "./Modal.css";
 import { API, graphqlOperation } from "aws-amplify";
 import {
@@ -30,7 +29,7 @@ const colors = [
 ];
 
 const dist = (a, b) => {
-  return Math.sqrt((a.cx - b.props.cx) ** 2 + (a.cy - b.props.cy) ** 2);
+  return Math.sqrt((a.cx - b.cx) ** 2 + (a.cy - b.cy) ** 2);
 };
 
 const not_transverse = (circle, otherCircles) => {
@@ -39,10 +38,7 @@ const not_transverse = (circle, otherCircles) => {
     return 1;
   }
   const dist_and_col = otherCircles.map((c) => {
-    return [
-      dist(circle, c) - circle.r - c.props.r,
-      circle.color === c.props.color,
-    ];
+    return [dist(circle, c) - circle.r - c.r, circle.color === c.color];
   });
   const valid_play = dist_and_col
     .map(([d, c]) => d >= 0)
@@ -72,6 +68,7 @@ const Board = () => {
   const [circY, setY] = useState(50);
   const [circR, setR] = useState(40);
   const [circColor, setColor] = useState("black");
+  const [solid, setSolid] = useState(false);
   const [circleList, setCircleList] = useState([]);
   const [highScores, setHighScores] = useState([
     { name: "Peter", score: 10 },
@@ -93,6 +90,16 @@ const Board = () => {
       document.getElementById("nameField").select();
     }
   }, [scoreIsShowing]);
+
+  const swapShades = () => {
+    const newSolid = !solid;
+    setSolid(newSolid);
+    const newCircles = circleList.map((c) => {
+      c.solid = newSolid;
+      return c;
+    });
+    setCircleList(newCircles);
+  };
 
   const newGame = () => {
     API.graphql(
@@ -182,13 +189,14 @@ const Board = () => {
     if (score_if_valid > 0) {
       setCircleList([
         ...circleList,
-        <Circle
-          key={circleList.length}
-          cx={clientX - rect.x}
-          cy={clientY - rect.y}
-          r={circR}
-          color={circColor}
-        />,
+        {
+          key: circleList.length,
+          cx: clientX - rect.x,
+          cy: clientY - rect.y,
+          r: circR,
+          color: circColor,
+          solid: solid,
+        },
       ]);
       setR(Math.floor(70 * Math.random(10, 80) + 10));
       setColor(colors[Math.floor(Math.random() * colors.length)]);
@@ -276,6 +284,26 @@ const Board = () => {
               top: "100%",
               left: "50%",
               transform: "translate(-50%, 10%)",
+              margin: "0",
+              backgroundColor: !solid ? "white" : "#2196f3",
+              color: solid ? "white" : "#2196f3",
+              width: "100px",
+            }}
+            onClick={swapShades}
+          >
+            {solid ? "Solid" : "Hollow"}
+          </button>
+        </div>
+        <div>
+          <button
+            style={{
+              position: "absolute",
+              top: "100%",
+              left: "75%",
+              transform: "translate(-82%, 10%)",
+              width: "100px",
+              padding: "4.8px 4.8px 4.8px 4.8px",
+              textAlign: "center",
             }}
             onClick={() => {
               handleScore();
@@ -285,26 +313,7 @@ const Board = () => {
             New game
           </button>
         </div>
-        <div
-          style={{
-            position: "absolute",
-            opacity: "99%",
-            top: "100%",
-            left: "75%",
-            transform: "translate(-100%, 10%)",
-            margin: "0",
-            zIndex: 5,
-          }}
-        >
-          <label className={"switch"}>
-            PROR
-            <input type="checkbox" defaultChecked="true" id="switch" />
-            <span className={"slider round"}></span>
-          </label>
-          <label htmlFor="switch">
-            <span data-yes="hollow" data-no="solid" />
-          </label>
-        </div>
+
         <div>
           <button
             style={{
@@ -313,6 +322,7 @@ const Board = () => {
               left: "100%",
               transform: "translate(-100%, 10%)",
               margin: "0",
+              width: "100px",
             }}
             onClick={rulesToggle}
           >
@@ -335,8 +345,16 @@ const Board = () => {
             height="100%"
             style={{ fill: "rgb(255,255,255)" }}
           />
-          {circleList}
-          <Circle cx={circX} cy={circY} r={circR} color={circColor} />
+          {circleList.map((c) => (
+            <Circle {...c} />
+          ))}
+          <Circle
+            cx={circX}
+            cy={circY}
+            r={circR}
+            color={circColor}
+            solid={solid}
+          />
         </svg>
       </div>
 
