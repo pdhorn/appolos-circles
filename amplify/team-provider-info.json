@@ -23,6 +23,11 @@
             "StackName": "amplify-appoloscircles-prod-185041",
             "StackId": "arn:aws:cloudformation:us-east-2:749178654254:stack/amplify-appoloscircles-prod-185041/d910cc20-b807-11ea-a643-02eb519684da",
             "AmplifyAppId": "d2dh4k8pyzxost"
+        },
+        "categories": {
+            "auth": {
+                "appoloscirclesc3d9929a": {}
+            }
         }
     }
 }

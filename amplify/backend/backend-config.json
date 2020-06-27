@@ -16,5 +16,13 @@
 				}
 			}
 		}
+	},
+	"auth": {
+		"appoloscirclesc3d9929a": {
+			"service": "Cognito",
+			"providerPlugin": "awscloudformation",
+			"dependsOn": [],
+			"customAuth": false
+		}
 	}
 }
