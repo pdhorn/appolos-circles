@@ -1,7 +1,6 @@
 import React from "react";
 
 const Circle = (props) => {
-  console.log(props.solid);
   return (
     <circle
       cx={props.cx}
