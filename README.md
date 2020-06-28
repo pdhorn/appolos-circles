@@ -1,3 +1,5 @@
+Tutorial on [AWS Amplify API stuff graphql](https://docs.amplify.aws/start/getting-started/data-model/q/integration/react#create-a-graphql-api-and-database)
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
