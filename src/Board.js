@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import "./Board.css";
 import Circle from "./Circle.js";
-import beep from "./beep.js";
+import { Beep } from "./beep.js";
 import useModal from "./useModal";
 import "./Modal.css";
 import { API, graphqlOperation } from "aws-amplify";
@@ -79,6 +79,7 @@ const Board = () => {
   const [rulesIsShowing, rulesToggle] = useModal();
   const [scoreIsShowing, scoreToggle] = useModal();
   const inputRef = useRef();
+  const nameRef = useRef();
 
   useEffect(() => {
     newGame();
@@ -87,7 +88,8 @@ const Board = () => {
 
   useEffect(() => {
     if (scoreIsShowing) {
-      document.getElementById("nameField").select();
+      // document.getElementById("nameField").select();
+      nameRef.current.select();
     }
   }, [scoreIsShowing]);
 
@@ -169,14 +171,20 @@ const Board = () => {
       });
   };
 
-  const handleMouse = (e) => {
+  const handleMouse = (e, t) => {
+    if (t === "touch") {
+      e = e.touches[0];
+    }
     const { clientX, clientY } = e;
     const rect = inputRef.current.getBoundingClientRect();
     setX(clientX - rect.x);
     setY(clientY - rect.y);
   };
 
-  const handleClick = (e) => {
+  const handleClick = (e, t) => {
+    if (t === "up") {
+      e = e.changedTouches[0];
+    }
     const { clientX, clientY } = e;
     const rect = inputRef.current.getBoundingClientRect();
     setX(clientX - rect.x);
@@ -202,7 +210,7 @@ const Board = () => {
       setColor(colors[Math.floor(Math.random() * colors.length)]);
       setScore(score + score_if_valid);
     } else {
-      beep();
+      new Beep().beep();
     }
   };
 
@@ -233,7 +241,7 @@ const Board = () => {
     if (scoresNeedUpdating) {
       const newScores = highScores.map((hs) => {
         if (hs.current) {
-          const n = document.getElementById("nameField").value;
+          const n = nameRef.current.value; // document.getElementById("nameField").value;
           const s = hs.score;
           nameToGame(gameID, n, s);
           saveScore(n, s);
@@ -339,6 +347,8 @@ const Board = () => {
           }}
           onMouseMove={(e) => handleMouse(e)}
           onClick={(e) => handleClick(e)}
+          onTouchMove={(e) => handleMouse(e, "touch")}
+          onTouchEnd={(e) => handleClick(e, "up")}
         >
           <rect
             width="100%"
@@ -367,6 +377,7 @@ const Board = () => {
           reset();
         }}
         highScores={highScores}
+        reference={nameRef}
       />
     </div>
   );
@@ -408,7 +419,7 @@ const RulesModal = ({ isShowing }) => {
     : null;
 };
 
-const ScoreModal = ({ isShowing, buttonAction, highScores }) => {
+const ScoreModal = ({ isShowing, buttonAction, highScores, reference }) => {
   return isShowing
     ? ReactDOM.createPortal(
         <React.Fragment>
@@ -434,6 +445,7 @@ const ScoreModal = ({ isShowing, buttonAction, highScores }) => {
                     return (
                       <li key={ind}>
                         <input
+                          ref={reference}
                           id="nameField"
                           type="text"
                           defaultValue={hs.name}
