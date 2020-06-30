@@ -239,9 +239,9 @@ const Board = () => {
       }
       allScores = allScores.slice(0, Math.min(highScores.length + 1, 10));
     }
+    setHighScores(allScores);
     if (allScores.map((s) => s.current).some((x) => x)) {
       setScoresNeedUpdating(true);
-      setHighScores(allScores);
     }
   };
 
