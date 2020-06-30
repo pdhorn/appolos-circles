@@ -70,6 +70,7 @@ const Board = () => {
   const [circColor, setColor] = useState("black");
   const [solid, setSolid] = useState(false);
   const [circleList, setCircleList] = useState([]);
+  const [beeper, setBeeper] = useState(null);
   const [highScores, setHighScores] = useState([
     { name: "Peter", score: 10 },
     { name: "Sam", score: 5 },
@@ -87,8 +88,7 @@ const Board = () => {
   }, []);
 
   useEffect(() => {
-    if (scoreIsShowing) {
-      // document.getElementById("nameField").select();
+    if (scoreIsShowing && scoresNeedUpdating) {
       nameRef.current.select();
     }
   }, [scoreIsShowing]);
@@ -172,6 +172,10 @@ const Board = () => {
   };
 
   const handleMouse = (e, t) => {
+    if (beeper === null) {
+      setBeeper(new Beep());
+    }
+
     if (t === "touch") {
       e = e.touches[0];
     }
@@ -179,6 +183,10 @@ const Board = () => {
     const rect = inputRef.current.getBoundingClientRect();
     setX(clientX - rect.x);
     setY(clientY - rect.y);
+  };
+
+  const handleStart = () => {
+    setBeeper(new Beep());
   };
 
   const handleClick = (e, t) => {
@@ -210,7 +218,7 @@ const Board = () => {
       setColor(colors[Math.floor(Math.random() * colors.length)]);
       setScore(score + score_if_valid);
     } else {
-      new Beep().beep();
+      beeper.beep();
     }
   };
 
@@ -312,6 +320,7 @@ const Board = () => {
               width: "100px",
               padding: "4.8px 4.8px 4.8px 4.8px",
               textAlign: "center",
+              backgroundColor: "white",
             }}
             onClick={() => {
               handleScore();
@@ -331,6 +340,7 @@ const Board = () => {
               transform: "translate(-100%, 10%)",
               margin: "0",
               width: "100px",
+              backgroundColor: "white",
             }}
             onClick={rulesToggle}
           >
@@ -347,6 +357,7 @@ const Board = () => {
           }}
           onMouseMove={(e) => handleMouse(e)}
           onClick={(e) => handleClick(e)}
+          onTouchStart={handleStart}
           onTouchMove={(e) => handleMouse(e, "touch")}
           onTouchEnd={(e) => handleClick(e, "up")}
         >
