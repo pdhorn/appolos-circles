@@ -8,9 +8,12 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "aws-amplify": "^3.0.18",
+    "elliptic": "^6.5.3",
+    "lodash": "^4.17.20",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1",
+    "react-scripts": "^3.4.3",
+    "serialize-javascript": "^4.0.0",
     "websocket-extensions": "0.1.4"
   },
   "scripts": {
