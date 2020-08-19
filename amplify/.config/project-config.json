@@ -7,8 +7,8 @@
         "config": {
             "SourceDir": "src",
             "DistributionDir": "build",
-            "BuildCommand": "run-scripts build",
-            "StartCommand": "run-scripts start"
+            "BuildCommand": "react-scripts build",
+            "StartCommand": "react-scripts start"
         }
     },
     "providers": [
