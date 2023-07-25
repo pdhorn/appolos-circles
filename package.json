@@ -8,7 +8,7 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "aws-amplify": "^5.3.5",
-    "elliptic": "^6.5.3",
+    "elliptic": "^6.5.4",
     "lodash": "^4.17.21",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
