@@ -7,14 +7,15 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
-    "aws-amplify": "^5.3.5",
+    "aws-amplify": "^6.4.3",
     "elliptic": "^6.5.4",
     "lodash": "^4.17.21",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "^5.0.1",
     "serialize-javascript": "^4.0.0",
-    "websocket-extensions": "0.1.4"
+    "websocket-extensions": "0.1.4",
+    "yarn-audit-fix": "^10.1.1"
   },
   "scripts": {
     "start": "react-scripts start",
