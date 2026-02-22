@@ -5,7 +5,7 @@ import Circle from "./Circle.js";
 import { Beep } from "./beep.js";
 import useModal from "./useModal";
 import "./Modal.css";
-import { API, graphqlOperation } from "aws-amplify";
+import { generateClient } from 'aws-amplify/api';
 import {
   createGame,
   updateGame,
@@ -82,6 +82,9 @@ const Board = () => {
   const inputRef = useRef();
   const nameRef = useRef();
 
+  const client = generateClient();
+
+
   useEffect(() => {
     newGame();
     fetchHighScores();
@@ -103,36 +106,45 @@ const Board = () => {
     setCircleList(newCircles);
   };
 
-  const newGame = () => {
-    API.graphql(
-      graphqlOperation(createGame, {
-        input: { startDate: new Date().toUTCString() },
-      })
-    )
-      .then((resp) => {
-        setGameID(resp.data.createGame.id);
-      })
-      .catch((err) => {
-        console.log(err);
+  const newGame = async () => {
+    try {
+      const resp = await client.graphql({
+        query: createGame,
+        variables: {
+          input: { startDate: new Date().toUTCString() },
+        },
       });
+
+      setGameID(resp.data.createGame.id);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const nameToGame = (i, n, s) => {
-    API.graphql(
-      graphqlOperation(updateGame, { input: { id: i, name: n, score: s } })
-    )
-      .then((resp) => {
-        console.log(resp.data.updateGame.id, "game updated with name", n);
-      })
-      .catch((err) => {
-        console.log(err);
+  const nameToGame = async (i, n, s) => {
+    try {
+      const resp = await client.graphql({
+        query: updateGame,
+        variables: {
+          input: {
+            id: i,
+            name: n,
+            score: s,
+          },
+        },
       });
+
+      console.log(resp.data.updateGame.id, "game updated with name", n);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const fetchHighScores = () => {
-    API.graphql(
-      graphqlOperation(
-        `query getShortHighScores{
+  const fetchHighScores = async () => {
+    try {
+      const resp = await client.graphql({
+        query: `
+        query getShortHighScores {
           listHighScores {
             items {
               id
@@ -140,35 +152,46 @@ const Board = () => {
               score
             }
           }
-        }`
-      )
-    )
-      .then((resp) => {
-        setHighScores(resp.data.listHighScores.items);
-      })
-      .catch((err) => {
-        console.log("error creating new game: ", err);
+        }
+      `,
       });
+
+      setHighScores(resp.data.listHighScores.items);
+    } catch (err) {
+      console.error("error fetching high scores:", err);
+    }
   };
 
-  const deleteScore = (id) => {
-    API.graphql(graphqlOperation(deleteHighScore, { input: { id: id } }))
-      .then((resp) => {
-        console.log(resp.data.deleteHighScore.id, "score deleted");
-      })
-      .catch((err) => {
-        console.log("error deleting high score:", id, err);
+  const deleteScore = async (id) => {
+    try {
+      const resp = client.graphql({
+        query: deleteHighScore,
+        variables: {
+          input: {
+            id: id
+          }
+        }
       });
-  };
 
-  const saveScore = (name, score) => {
-    API.graphql(graphqlOperation(createHighScore, { input: { name, score } }))
-      .then((resp) => {
-        console.log(resp.data.createHighScore.id, "score created");
-      })
-      .catch((err) => {
-        console.log("error saving high score:", name, score, err);
+      console.log(resp.data.deleteHighScore.id, "score deleted");
+    } catch (err) {
+      console.log("error deleting high score:", id, err);
+    }
+  }
+
+  const saveScore = async (name, score) => {
+    try {
+      const resp = await client.graphql({
+        query: createHighScore,
+        variables: {
+          input: { name, score },
+        },
       });
+
+      console.log(resp.data.createHighScore.id, "score created");
+    } catch (err) {
+      console.error("error saving high score:", name, score, err);
+    }
   };
 
   const handleMouse = (e, t) => {
@@ -397,83 +420,83 @@ const Board = () => {
 const RulesModal = ({ isShowing }) => {
   return isShowing
     ? ReactDOM.createPortal(
-        <React.Fragment>
-          <div className="modal-overlay" />
-          <div
-            className="modal-wrapper"
-            aria-modal
-            aria-hidden
-            tabIndex={-1}
-            role="dialog"
-          >
-            <div className="modal">
-              <div className="modal-header">
-                Plop as many circles as you can without overlapping them. <br />
-                <br />
-                Earn points:
-                <ul>
-                  <li>+1 for each circle you plop</li>
-                  <li>
-                    +1 for each circle that is tangent to your plopped circle
-                  </li>
-                  <li>
-                    +1 for each circle that is tangent to and of the same color
-                    as your plopped circle
-                  </li>
-                </ul>
-              </div>
+      <React.Fragment>
+        <div className="modal-overlay" />
+        <div
+          className="modal-wrapper"
+          aria-modal
+          aria-hidden
+          tabIndex={-1}
+          role="dialog"
+        >
+          <div className="modal">
+            <div className="modal-header">
+              Plop as many circles as you can without overlapping them. <br />
+              <br />
+              Earn points:
+              <ul>
+                <li>+1 for each circle you plop</li>
+                <li>
+                  +1 for each circle that is tangent to your plopped circle
+                </li>
+                <li>
+                  +1 for each circle that is tangent to and of the same color
+                  as your plopped circle
+                </li>
+              </ul>
             </div>
           </div>
-        </React.Fragment>,
-        document.body
-      )
+        </div>
+      </React.Fragment>,
+      document.body
+    )
     : null;
 };
 
 const ScoreModal = ({ isShowing, buttonAction, highScores, reference }) => {
   return isShowing
     ? ReactDOM.createPortal(
-        <React.Fragment>
-          <div className="modal-overlay" />
-          <div
-            className="modal-wrapper"
-            aria-modal
-            aria-hidden
-            tabIndex={-1}
-            role="dialog"
-          >
-            <div className="modal">
-              <div className="modal-header">High scores</div>
-              <ol>
-                {highScores.map((hs, ind) => {
-                  if (!hs.hasOwnProperty("current")) {
-                    return (
-                      <li key={ind}>
-                        {hs.name} - {hs.score}
-                      </li>
-                    );
-                  } else if (hs.current === true) {
-                    return (
-                      <li key={ind}>
-                        <input
-                          ref={reference}
-                          id="nameField"
-                          type="text"
-                          defaultValue={hs.name}
-                        />{" "}
-                        - {hs.score}
-                      </li>
-                    );
-                  }
-                  return true;
-                })}
-              </ol>
-              <button onClick={buttonAction}>New game</button>
-            </div>
+      <React.Fragment>
+        <div className="modal-overlay" />
+        <div
+          className="modal-wrapper"
+          aria-modal
+          aria-hidden
+          tabIndex={-1}
+          role="dialog"
+        >
+          <div className="modal">
+            <div className="modal-header">High scores</div>
+            <ol>
+              {highScores.map((hs, ind) => {
+                if (!hs.hasOwnProperty("current")) {
+                  return (
+                    <li key={ind}>
+                      {hs.name} - {hs.score}
+                    </li>
+                  );
+                } else if (hs.current === true) {
+                  return (
+                    <li key={ind}>
+                      <input
+                        ref={reference}
+                        id="nameField"
+                        type="text"
+                        defaultValue={hs.name}
+                      />{" "}
+                      - {hs.score}
+                    </li>
+                  );
+                }
+                return true;
+              })}
+            </ol>
+            <button onClick={buttonAction}>New game</button>
           </div>
-        </React.Fragment>,
-        document.body
-      )
+        </div>
+      </React.Fragment>,
+      document.body
+    )
     : null;
 };
 
