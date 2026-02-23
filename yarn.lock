@@ -200,7 +200,7 @@
     qrcode "^1.4.4"
     uuid "^8.2.0"
 
-"@aws-amplify/ui-react@^0.2.9":
+"@aws-amplify/ui-react@^0.2.38":
   version "0.2.38"
   resolved "https://registry.yarnpkg.com/@aws-amplify/ui-react/-/ui-react-0.2.38.tgz#d38ce24b4ede0858483fc9471ab968a3c209373f"
   integrity sha512-IpV+GxJh6tpCE0t+l7JK78R3A0SPmg5FnFFMHVzq3Q7rmiD65NSaVHz2Rt7iJWXFy+gAR6aEsig3ko0YLPByAw==
