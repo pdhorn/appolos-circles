@@ -13,7 +13,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "^5.0.1",
-    "serialize-javascript": "^7.0.3",
+    "serialize-javascript": "^7.0.5",
     "websocket-extensions": "0.1.4",
     "yarn-audit-fix": "^10.1.1"
   },
