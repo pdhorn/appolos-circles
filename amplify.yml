@@ -4,7 +4,7 @@ backend:
     build:
       commands:
         - npm install --prefix /tmp/ampx-install @aws-amplify/backend-cli
-        - npm install --no-save --legacy-peer-deps @aws-amplify/backend
+        - npm install --no-save --legacy-peer-deps @aws-amplify/backend aws-cdk-lib
         - npm_config_user_agent="npm" /tmp/ampx-install/node_modules/.bin/ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
 frontend:
   phases:
