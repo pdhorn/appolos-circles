@@ -23,6 +23,7 @@ yarn-debug.log*
 yarn-error.log*
 
 amplify_outputs.json
+src/amplify_outputs.json
 build/
 dist/
 node_modules/

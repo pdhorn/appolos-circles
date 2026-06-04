@@ -1,12 +1,36 @@
-Tutorial on [AWS Amplify API stuff graphql](https://docs.amplify.aws/start/getting-started/data-model/q/integration/react#create-a-graphql-api-and-database)
+# Appolo's Circles
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A circle placement game with a global high score board, built with React and AWS Amplify Gen 2.
+
+## Backend
+
+The backend is defined in `amplify/` using [AWS Amplify Gen 2](https://docs.amplify.aws/react/). It provisions an AppSync GraphQL API and DynamoDB tables for `HighScore` and `Game` models.
+
+### Local development
+
+To run the backend locally, you need AWS credentials with sufficient permissions, then:
+
+```bash
+npx ampx sandbox
+```
+
+This generates `src/amplify_outputs.json` which the frontend uses to connect to the API.
+
+### CI/CD notes
+
+- This project uses **npm** (`package-lock.json`). There is no `yarn.lock` — do not add one, as CDK will error if both lockfiles are present.
+- `amplify/package.json` declares `"type": "module"` and is required for CDK/ESM to work correctly. Do not delete it.
+- CDK must be bootstrapped once per AWS account/region before Gen 2 deploys work:
+  ```bash
+  npx cdk bootstrap aws://<account-id>/<region>
+  ```
+- `src/amplify_outputs.json` is generated at build time by `npx ampx pipeline-deploy` and is not committed to git.
 
 ## Available Scripts
 
 In the project directory, you can run:
 
-### `yarn start`
+### `npm start`
 
 Runs the app in the development mode.<br />
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
@@ -14,12 +38,12 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 The page will reload if you make edits.<br />
 You will also see any lint errors in the console.
 
-### `yarn test`
+### `npm test`
 
 Launches the test runner in the interactive watch mode.<br />
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `yarn build`
+### `npm run build`
 
 Builds the app for production to the `build` folder.<br />
 It correctly bundles React in production mode and optimizes the build for the best performance.
@@ -29,7 +53,7 @@ Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `yarn eject`
+### `npm run eject`
 
 **Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
@@ -65,6 +89,6 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/ad
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
 
-### `yarn build` fails to minify
+### `npm run build` fails to minify
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
